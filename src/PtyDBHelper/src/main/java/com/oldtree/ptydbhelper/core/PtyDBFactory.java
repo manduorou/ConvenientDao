@@ -299,8 +299,10 @@ public class PtyDBFactory implements TableFactory{
                         case "String":
                             field.set(newInstance,cursor.getString(index));
                             break;
+                        case "Character":
                         case "char":
                             field.set(newInstance,cursor.getString(index).toCharArray()[0]);
+                            break;
                         default:
                             throw new RuntimeException("无法映射对应属性"+fieldTypeSimpleName+"类型的数据类型");
                     }
