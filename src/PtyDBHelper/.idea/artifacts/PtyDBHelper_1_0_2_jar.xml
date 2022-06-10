@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact name="PtyDBHelper-1.0.1:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/PtyDBHelper_1_0_1_jar</output-path>
+  <artifact name="PtyDBHelper-1.0.2:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PtyDBHelper_1_0_2_jar</output-path>
     <root id="root">
       <element id="archive" name="PtyDBHelper.jar">
         <element id="module-output" name="PtyDBHelper" />

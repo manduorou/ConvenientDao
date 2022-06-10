@@ -1,6 +1,7 @@
-package com.oldtree.ptydbhelper;
+package com.oldtree.ptydbhelper.dao;
 
 import android.database.sqlite.SQLiteDatabase;
+import com.oldtree.ptydbhelper.core.Condition;
 import com.oldtree.ptydbhelper.core.Pk;
 import com.oldtree.ptydbhelper.core.PtyDBFactory;
 import com.oldtree.ptydbhelper.exception.PoJoException;
@@ -22,7 +23,7 @@ import java.util.Set;
  * @Date 2022/5/1
  * @Version 1.0
  */
-public abstract class PtyAbstractDao<T,E> {
+public abstract class PtyAbstractDao<T> implements PtyDao<T> {
     private PtyDBFactory ptyDBFactory;
     private Class<?> aClass;
     public PtyAbstractDao(Class<?> aClass) {
@@ -30,22 +31,36 @@ public abstract class PtyAbstractDao<T,E> {
         this.aClass = aClass;
         mappingTable(this.aClass);
     }
-
     /**
      * 映射表,这里我写死了
      * @param cls
      */
-    private void mappingTable(Class<?> cls){
+    protected void mappingTable(Class<?> cls){
         SQLiteDatabase database = ptyDBFactory.getDbOpenHelper().getWritableDatabase();
         ptyDBFactory.createTableByClass(database,cls);
     }
+
+    /**
+     * 删除当前被映射的表
+     */
+    protected void dropTheMappedTable(){
+        SQLiteDatabase database = ptyDBFactory.getDbOpenHelper().getWritableDatabase();
+        try {
+            TableProperty oneTableProperties = ptyDBFactory.getPoJoClassHandler().createOneTableProperties(aClass);
+            ptyDBFactory.dropTable(database,oneTableProperties);
+        } catch (PoJoException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 保存无须条件
-     * @param element
+     * @param pojoInstance
      * @return
      */
-    public boolean saveOne(T element){
-        Carrier carrier = CarrierBuilder.build(element);
+    @Override
+    public boolean saveOne(T pojoInstance){
+        Carrier carrier = CarrierBuilder.build(pojoInstance);
         return ptyDBFactory.getPerformer().saveOne(carrier);
     }
 
@@ -57,7 +72,8 @@ public abstract class PtyAbstractDao<T,E> {
      * @param pojoInstance
      * @return
      */
-    public boolean updateOne(Object pojoInstance){
+    @Override
+    public boolean updateOne(T pojoInstance){
         try {
             CarrierBuilder.handledPojoInstance(pojoInstance);
         } catch (PoJoException e) {
@@ -93,14 +109,15 @@ public abstract class PtyAbstractDao<T,E> {
      * @param list
      * @return
      */
-    public boolean saveList(List<E> list){
+    @Override
+    public boolean saveList(List<T> list){
         boolean flag = false;
         Set<Carrier> set = null;
         if(null!=list&&list.size()>0){
             set = new LinkedHashSet<>();
             Carrier carrier = null;
-            for (E e : list) {
-                carrier = CarrierBuilder.build(e);
+            for (T t : list) {
+                carrier = CarrierBuilder.build(t);
                 set.add(carrier);
             }
             flag = ptyDBFactory.getPerformer().saveList(set);
@@ -113,16 +130,18 @@ public abstract class PtyAbstractDao<T,E> {
      * @param query
      * @return
      */
-    public List<E> getList(Query query){
+    @Override
+    public List<T> getList(Query query){
         return ptyDBFactory.getPerformer().findByQuery(query);
     }
 
     /**
      * 根据id删除
-     * @param id
+     * @param fk
      * @return
      */
-    public boolean deleteById(Integer id){
+    @Override
+    public boolean deleteByFk(Object fk){
         Object instance = null;
         try {
             instance =  aClass.newInstance();
@@ -132,27 +151,28 @@ public abstract class PtyAbstractDao<T,E> {
             e.printStackTrace();
         }
         Carrier carrier = CarrierBuilder.build(instance);
-        carrier.getConstraint().append(" ='").append(id).append("'");
+        carrier.getConstraint().append(" ='").append(fk).append("'");
         return ptyDBFactory.getPerformer().deleteByCarrier(carrier);
     }
     /**
      * 根据id查询
-     * @param id
+     * @param fk
      * @return
      */
-    public T findById(Integer id){
+    @Override
+    public T findByFk(Object fk){
         Property pkProperty = null;
         try {
-            pkProperty = ptyDBFactory.getPoJoClassHandler().createPkProperty(aClass);
+            pkProperty = ptyDBFactory.getPoJoClassHandler().createPkProperty(this.aClass);
         } catch (PoJoException e) {
             e.printStackTrace();
         }
-        Query query = QueryBuilder.build(aClass)
-                .eq(pkProperty,id);
-        List<E> list = ptyDBFactory.getPerformer().findByQuery(query);
+        Query query = QueryBuilder.build(this.aClass)
+                .eq(pkProperty,fk);
+        List<T> list = ptyDBFactory.getPerformer().findByQuery(query);
         T instance = null;
         if(null!=list&&list.size()>0){
-            instance = (T) list.get(0);
+            instance = list.get(0);
         }
         return instance;
     }
@@ -161,22 +181,35 @@ public abstract class PtyAbstractDao<T,E> {
      * 查询所有
      * @return
      */
-    public List<E> findAll(){
+    public List<T> findAll(){
         Query query = QueryBuilder.build(aClass).getAll();
         return ptyDBFactory.getPerformer().findByQuery(query);
     }
-
     /**
-     * 删除当前被映射的表
+     * 根据列名查询
      */
-    protected void dropTheMappedTable(){
-        SQLiteDatabase database = ptyDBFactory.getDbOpenHelper().getWritableDatabase();
-        try {
-            TableProperty oneTableProperties = ptyDBFactory.getPoJoClassHandler().createOneTableProperties(aClass);
-            ptyDBFactory.dropTable(database,oneTableProperties);
-        } catch (PoJoException e) {
-            e.printStackTrace();
+    public List<T> findByColumn(Object columnName,String condition,Object value){
+        Query query = QueryBuilder.build(aClass);
+        switch (condition){
+            case "=":
+                query.eq(columnName.toString(),value);
+                break;
+            case ">":
+                query.gt(columnName.toString(),value);
+                break;
+            case "<":
+                query.lt(columnName.toString(),value);
+                break;
+            case "lk":
+                query.like(columnName.toString(),value);
+                break;
+            default:
+                throw new IllegalStateException("====>\tUnexpected value: " + condition);
         }
+        if(null==query.getConditions()||query.getConditions().equals("")){
+            throw new NullPointerException("====>\t所给的条件不符合: 可以选择\">\",\"<\",\"=\",\"like\"等");
+        }
+        return getList(query);
     }
 }
 

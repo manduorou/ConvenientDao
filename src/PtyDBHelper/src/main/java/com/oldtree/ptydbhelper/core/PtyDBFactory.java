@@ -98,8 +98,8 @@ public class PtyDBFactory implements TableFactory{
      */
     public void createAllTables(SQLiteDatabase sqLiteDatabase) throws Exception {
         if(configProperty==null){
-            Log.e("PitaYaDao","创建所有表存在配置装载错误");
-            throw  new ConfigException("配置类没有装载");
+            Log.e("PitaYaDao","====>\t创建所有表存在配置装载错误");
+            throw  new ConfigException("====>\t配置类没有装载");
         }
         Set<Class<?>> classSet = poJoClassHandler.getClassArrayByProperty(configProperty);
         if(null!=classSet&&classSet.size()>0){
@@ -108,7 +108,7 @@ public class PtyDBFactory implements TableFactory{
                 createTable(sqLiteDatabase,tableProperty);
             }
         }
-        Log.e("PitaYaDao","This databases was initialized successfully!!!!");
+        Log.e("PitaYaDao","====>\tThis databases was initialized successfully!!!!");
     }
 
     /**
@@ -237,7 +237,7 @@ public class PtyDBFactory implements TableFactory{
         public List<E> findByQuery(Query query) {
             List list = null;
             String queryRows = QueryResolver.resolvedQuery(query);
-            Log.d("PitaYaDao",queryRows);
+            Log.d("PitaYaDao","====>\t"+queryRows);
             sqLiteDatabase = dbOpenHelper.getReadableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery(queryRows, null);
             if(cursor!=null){
@@ -304,7 +304,7 @@ public class PtyDBFactory implements TableFactory{
                             field.set(newInstance,cursor.getString(index).toCharArray()[0]);
                             break;
                         default:
-                            throw new RuntimeException("无法映射对应属性"+fieldTypeSimpleName+"类型的数据类型");
+                            throw new RuntimeException("====>\t无法映射对应属性"+fieldTypeSimpleName+"类型的数据类型");
                     }
                     field.setAccessible(false);
                 }

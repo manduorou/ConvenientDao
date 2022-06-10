@@ -1,7 +1,5 @@
 package com.oldtree.ptydbhelper.dao;
 
-import com.oldtree.ptydbhelper.PtyAbstractDao;
-
 /**
  * 详细介绍类的情况.
  *
