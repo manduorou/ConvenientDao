@@ -3,6 +3,7 @@ package com.oldtree.ptydbhelper.core;
 import android.content.Context;
 import android.util.Log;
 import com.oldtree.ptydbhelper.config.PtyConfig;
+import com.oldtree.ptydbhelper.log.PtyLog;
 import com.oldtree.ptydbhelper.property.ConfigProperty;
 
 /**
@@ -14,7 +15,6 @@ import com.oldtree.ptydbhelper.property.ConfigProperty;
  * @Version 1.0
  */
 public final class PtyMaster {
-
     private static PtyMaster ptyMaster =null;
     private Class<?> configCls;
 
@@ -44,10 +44,10 @@ public final class PtyMaster {
     public PtyMaster autoConfig(Context context){
         PtyConfig ptyConfig = configCls.getDeclaredAnnotation(PtyConfig.class);
         if(null==ptyConfig||null==context){
-            Log.e("PtyDBHelper","====>\t空指针异常，context或者没有将注解配置类载入PtyMaster中。。");
+            Log.e("PtyDBHelper",PtyLog.MSG_PREFIX+"空指针异常，context或者没有将注解配置类载入PtyMaster中。。");
             throw  new NullPointerException();
         }
-        ConfigProperty configProperty = ConfigProperty.getInstance(ptyConfig.dbName(),ptyConfig.dbVersion(),ptyConfig.pojoClassArray(),context);
+        ConfigProperty configProperty = ConfigProperty.getInstance(ptyConfig.dbName(),ptyConfig.dbVersion(),ptyConfig.pojoClassArray(),context , ptyConfig.appDebug());
         DBOpenHelper.getInstance(configProperty);
         showMsg();
         return this;
@@ -68,25 +68,25 @@ public final class PtyMaster {
      * logo showing...
      */
     private void showMsg(){
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
-        Log.d("PtyDBHelper","====>\t-----------------------<<<欢迎使用>>>-------------------------");
-        Log.d("PtyDBHelper","====>\t---本框架是一个轻量级ORM，便捷开发，支持原生sqlite语句，无其他依赖---");
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
-        Log.d("PtyDBHelper","====>\t----@@@@------@@--------------@@----------------------------");
-        Log.d("PtyDBHelper","====>\t--@@----@@----@@--------------@@----------------------------");
-        Log.d("PtyDBHelper","====>\t-@@------@@---@@--------------@@----------------------------");
-        Log.d("PtyDBHelper","====>\t@@--------@@--@@--------------@@----------------------------");
-        Log.d("PtyDBHelper","====>\t@@--------@@--@@---------@@@@-@@----@@@@@--@@@---@@@@--@@@@-");
-        Log.d("PtyDBHelper","====>\t@@--------@@--@@--------@-----@@------@----@@-@--@-----@----");
-        Log.d("PtyDBHelper","====>\t-@@------@@---@@-------@------@@------@----@@@---@@@@--@@@@-");
-        Log.d("PtyDBHelper","====>\t--@@----@@----@@--------@----@@-------@----@--@--@-----@----");
-        Log.d("PtyDBHelper","====>\t----@@@@-------@@@@@@@@---@@--@@------@----@---@-@@@@--@@@@-");
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
-        Log.d("PtyDBHelper","====>\t----------------------------------------------qq：493582307-");
-        Log.d("PtyDBHelper","====>\t------------------------------------------Version--1.0.2----");
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
-        Log.d("PtyDBHelper","====>\t------------------------------------------------------------");
+        PtyLog.v("------------------------------------------------------------");
+        PtyLog.v("------------------------------------------------------------");
+        PtyLog.v("-----------------------<<<欢迎使用>>>-------------------------");
+        PtyLog.v("---本框架是一个轻量级ORM，便捷开发，支持原生sqlite语句，无其他依赖---");
+        PtyLog.v("------------------------------------------------------------");
+        PtyLog.v("----@@@@------@@--------------@@----------------------------");
+        PtyLog.v("--@@----@@----@@--------------@@----------------------------");
+        PtyLog.v("-@@------@@---@@--------------@@----------------------------");
+        PtyLog.v("@@--------@@--@@--------------@@----------------------------");
+        PtyLog.v("@@--------@@--@@---------@@@@-@@----@@@@@--@@@---@@@@--@@@@-");
+        PtyLog.v("@@--------@@--@@--------@-----@@------@----@@-@--@-----@----");
+        PtyLog.v("-@@------@@---@@-------@------@@------@----@@@---@@@@--@@@@-");
+        PtyLog.v("--@@----@@----@@--------@----@@-------@----@--@--@-----@----");
+        PtyLog.v("----@@@@-------@@@@@@@@---@@--@@------@----@---@-@@@@--@@@@-");
+        PtyLog.v("------------------------------------------------------------");
+        PtyLog.v("----------------------------------------------qq：493582307-");
+        PtyLog.v("------------------------------------------Version--1.0.2----");
+        PtyLog.v("------------------------------------------------------------");
+        PtyLog.v("------------------------------------------------------------");
     }
 }
 

@@ -1,15 +1,16 @@
 package com.oldtree.ptydbhelper.core;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import com.oldtree.ptydbhelper.exception.ConfigException;
 import com.oldtree.ptydbhelper.exception.PoJoException;
+import com.oldtree.ptydbhelper.log.PtyLog;
 import com.oldtree.ptydbhelper.property.ConfigProperty;
 import com.oldtree.ptydbhelper.property.TableProperty;
 import com.oldtree.ptydbhelper.query.Query;
 import com.oldtree.ptydbhelper.stmt.Carrier;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 /**
@@ -61,18 +62,22 @@ public class PtyDBFactory implements TableFactory{
 
     @Override
     public void createTable(SQLiteDatabase sqLiteDatabase, TableProperty tableProperty) {
+        PtyLog.d("正在创建表<"+tableProperty.getTabName()+">");
         String sql = PropertyResolver.resolvedPropertyToCreate(tableProperty);
-        Log.d("PitaYaDao",sql);
+        PtyLog.d(sql);
         sqLiteDatabase.execSQL(sql);
-        Log.e("PitaYaDao","This table was created successfully!!!!");
+        PtyLog.d("<<<<<创建成功>>>>>");
+
     }
 
     @Override
     public void dropTable(SQLiteDatabase sqLiteDatabase, TableProperty tableProperty) {
+        PtyLog.d("正在删除表<"+tableProperty.getTabName()+">");
         String sql = PropertyResolver.resolvedPropertyToDrop(tableProperty);
-        Log.d("PitaYaDao",sql);
-        Log.d("PtyDBHelper","Drop the table successfully！Was dropped the tableName:"+tableProperty.getTabName());
+        PtyLog.d(sql);
         sqLiteDatabase.execSQL(sql);
+        PtyLog.d("<<<<<删除成功>>>>>");
+
     }
 
     /**
@@ -98,8 +103,8 @@ public class PtyDBFactory implements TableFactory{
      */
     public void createAllTables(SQLiteDatabase sqLiteDatabase) throws Exception {
         if(configProperty==null){
-            Log.e("PitaYaDao","====>\t创建所有表存在配置装载错误");
-            throw  new ConfigException("====>\t配置类没有装载");
+            PtyLog.e("创建所有表存在配置未装载错误，无法映射数据库");
+            throw  new ConfigException("配置类没有装载");
         }
         Set<Class<?>> classSet = poJoClassHandler.getClassArrayByProperty(configProperty);
         if(null!=classSet&&classSet.size()>0){
@@ -108,7 +113,7 @@ public class PtyDBFactory implements TableFactory{
                 createTable(sqLiteDatabase,tableProperty);
             }
         }
-        Log.e("PitaYaDao","====>\tThis databases was initialized successfully!!!!");
+        PtyLog.v("This database was initialized successfully!!!!"+new Date());
     }
 
     /**
@@ -144,7 +149,6 @@ public class PtyDBFactory implements TableFactory{
     public static class DBPerFormer<E> implements Performer<E>{
         private DBOpenHelper dbOpenHelper;
         private SQLiteDatabase sqLiteDatabase;
-
         public DBPerFormer(DBOpenHelper dbOpenHelper) {
             this.dbOpenHelper = dbOpenHelper;
         }
@@ -158,6 +162,7 @@ public class PtyDBFactory implements TableFactory{
         public boolean saveOne(Carrier carrier) {
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
             long rows = sqLiteDatabase.insert(carrier.getTableName(),"", carrier.getContentValues());
+            PtyLog.d("saveOne<"+carrier.getContentValues()+">\tresponse rows："+rows+"行"+new Date());
             dbOpenHelper.close();
             return rows>0;
         }
@@ -193,11 +198,12 @@ public class PtyDBFactory implements TableFactory{
          */
         @Override
         public boolean updateOne(Carrier carrier) {
-            long update = -1L;
+            long rows = -1L;
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
-            update = sqLiteDatabase.update(carrier.getTableName(), carrier.getContentValues(), carrier.getConstraint().toString(), null);
+            rows = sqLiteDatabase.update(carrier.getTableName(), carrier.getContentValues(), carrier.getConstraint().toString(), null);
+            PtyLog.d("updateOne<"+carrier.getContentValues()+">\tresponse rows："+rows+"行"+new Date());
             dbOpenHelper.close();
-            return update>0;
+            return rows>0;
         }
 
         /**
@@ -208,11 +214,12 @@ public class PtyDBFactory implements TableFactory{
         @Deprecated
         @Override
         public boolean saveOrUpdate(Carrier carrier) {
-            long update = -1L;
+            long rows = -1L;
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
-            update = sqLiteDatabase.update(carrier.getTableName(), carrier.getContentValues(), carrier.getConstraint().toString(), null);
+            rows = sqLiteDatabase.update(carrier.getTableName(), carrier.getContentValues(), carrier.getConstraint().toString(), null);
+            PtyLog.d("saveOrReplace<"+carrier.getContentValues()+">\tresponse rows："+rows+"行"+new Date());
             dbOpenHelper.close();
-            return update>0;
+            return rows>0;
         }
 
         /**
@@ -222,11 +229,12 @@ public class PtyDBFactory implements TableFactory{
          */
         @Override
         public boolean deleteByCarrier(Carrier carrier) {
-            int delete =-1;
+            int rows =-1;
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
-            delete = sqLiteDatabase.delete(carrier.getTableName(),carrier.getConstraint().toString(),null);
+            rows = sqLiteDatabase.delete(carrier.getTableName(),carrier.getConstraint().toString(),null);
+            PtyLog.d("delete<"+carrier.getContentValues()+">\tresponse rows："+rows+"行"+new Date());
             dbOpenHelper.close();
-            return delete>0L;
+            return rows>0L;
         }
         /**
          * 反射获取实例化对象
@@ -236,11 +244,11 @@ public class PtyDBFactory implements TableFactory{
         @Override
         public List<E> findByQuery(Query query) {
             List list = null;
-            String queryRows = QueryResolver.resolvedQuery(query);
-            Log.d("PitaYaDao","====>\t"+queryRows);
+            String sql = QueryResolver.resolvedQuery(query);
+            PtyLog.d(sql);
             sqLiteDatabase = dbOpenHelper.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery(queryRows, null);
-            if(cursor!=null){
+            Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+            if(cursor!=null&&cursor.getCount()>0){
                 list = new ArrayList();
                 while (cursor.moveToNext()){
                     Class<?> cls = query.getCls();
@@ -255,10 +263,10 @@ public class PtyDBFactory implements TableFactory{
                     }
                 }
             }
+            PtyLog.d("data:"+list);
             dbOpenHelper.close();
             return list;
         }
-
         /**
          * 通过无参构造反射实例，对应类型调用set方法映射数据
          * @param fields
@@ -304,7 +312,9 @@ public class PtyDBFactory implements TableFactory{
                             field.set(newInstance,cursor.getString(index).toCharArray()[0]);
                             break;
                         default:
-                            throw new RuntimeException("====>\t无法映射对应属性"+fieldTypeSimpleName+"类型的数据类型");
+                            field.set(newInstance,cursor.getString(index));
+                            PtyLog.w("属性为："+fieldName+"，暂时无法映射对应属性类型：《"+fieldTypeSimpleName+"》类型的数据类型，所以这里映射成了TEXT类型");
+                            throw new RuntimeException("无法映射对应属性"+fieldTypeSimpleName+"类型的数据类型");
                     }
                     field.setAccessible(false);
                 }

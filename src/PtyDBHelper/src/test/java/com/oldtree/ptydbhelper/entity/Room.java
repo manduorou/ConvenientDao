@@ -1,5 +1,7 @@
 package com.oldtree.ptydbhelper.entity;
 
+import com.oldtree.ptydbhelper.core.NotNull;
+import com.oldtree.ptydbhelper.core.Pk;
 import com.oldtree.ptydbhelper.core.PoJo;
 
 /**
@@ -12,6 +14,8 @@ import com.oldtree.ptydbhelper.core.PoJo;
  */
 @PoJo("roomTable")
 public class Room {
+    @NotNull
+    @Pk(autoincrement = true)
     private Long roomId;
     private String username;
     private char sex;

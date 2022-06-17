@@ -3,6 +3,7 @@ package com.oldtree.ptydbhelper.core;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import com.oldtree.ptydbhelper.log.PtyLog;
 import com.oldtree.ptydbhelper.property.ConfigProperty;
 
 /**
@@ -59,11 +60,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        Log.i("PitaYaDAO", "更新sqlite，老版本：" + oldVersion + " 到新版本： " + newVersion + " ，此操作将删除所有表");
+        PtyLog.i("更新sqlite，老版本：" + oldVersion + "到新版本:" + newVersion + " ，此操作将删除之前所有表");
         PtyDBFactory ptyDBFactory = PtyDBFactory.build();
         try {
             ptyDBFactory.dropAllTables(sqLiteDatabase);
-
             ptyDBFactory.createAllTables(sqLiteDatabase);
         } catch (Exception e) {
             e.printStackTrace();

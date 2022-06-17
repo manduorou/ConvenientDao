@@ -11,7 +11,7 @@ import com.oldtree.ptydbhelper.entity.User;
  * @Date 2022/4/28
  * @Version 1.0
  */
-@PtyConfig(pojoClassArray = {User.class, Score.class})
+@PtyConfig(pojoClassArray = {User.class, Score.class} ,appDebug = false)
 public class Config {
 
 }

@@ -99,7 +99,7 @@ public class PoJoClassHandler {
      * 主要功能：根据cls类的生成一个tableProperties
      * 详细：
      * 遍历cls类下面的所有field进行字段上面的注解处理
-     * 主键必然不能接受null值，如果对应的field上面有NotNull注解，必须不是主键
+     * 主键必然能接受null值，如果对应的field上面有NotNull注解，必须不是主键
      * 这里检测cls中的所有必要属性，比如pojo注解和pk注解是否加上了
      * @param cls
      * @return
@@ -123,8 +123,9 @@ public class PoJoClassHandler {
                     if(pk.autoincrement()){
                         column.setOther("autoAdd");
                     }
+                    column.setCanNull(pk.canNull());
                 }
-                if(notNull!=null&&pk==null||(pk!=null)) {
+                if(notNull!=null) {
                     column.setCanNull(false);
                 }
                 columnSet.add(column);

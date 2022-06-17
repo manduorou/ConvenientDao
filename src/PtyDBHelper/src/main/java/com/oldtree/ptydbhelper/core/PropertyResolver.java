@@ -3,6 +3,7 @@ package com.oldtree.ptydbhelper.core;
 import com.oldtree.ptydbhelper.config.SqlColumnTypesMapper;
 import com.oldtree.ptydbhelper.property.TableProperty;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 解析Property.
@@ -20,17 +21,14 @@ public class PropertyResolver {
      */
     public static String resolvedPropertyToCreate(TableProperty tableProperty){
         final String head = SqlColumnTypesMapper.sqlMapper.get("createTable");
-        StringBuffer sql = new StringBuffer();
-        sql.append(head).append(tableProperty.getTabName()).append(" (\n");
-        Iterator<TableProperty.Column> iterator = tableProperty.getColumns().iterator();
-        String other = null;
-        while (iterator.hasNext()){
-            TableProperty.Column column = iterator.next();
-            sql = mappedExistsTypes(sql,column);
-        }
-        int i = sql.lastIndexOf(",");
-        sql.replace(i,i+1,"");
-        sql.append(")");
+        AtomicReference<StringBuffer> sql = new AtomicReference<>(new StringBuffer());
+        sql.get().append(head).append(tableProperty.getTabName()).append(" (\n");
+        tableProperty.getColumns().forEach((column -> {
+            sql.set(mappedExistsTypes(sql.get(), column));
+        }));
+        int i = sql.get().lastIndexOf(",");
+        sql.get().replace(i,i+1,"");
+        sql.get().append(")");
         return sql.toString();
     }
 

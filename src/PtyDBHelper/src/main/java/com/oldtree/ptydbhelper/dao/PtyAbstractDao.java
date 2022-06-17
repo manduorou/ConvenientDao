@@ -1,10 +1,12 @@
 package com.oldtree.ptydbhelper.dao;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.oldtree.ptydbhelper.core.Condition;
 import com.oldtree.ptydbhelper.core.Pk;
 import com.oldtree.ptydbhelper.core.PtyDBFactory;
 import com.oldtree.ptydbhelper.exception.PoJoException;
+import com.oldtree.ptydbhelper.log.PtyLog;
 import com.oldtree.ptydbhelper.property.Property;
 import com.oldtree.ptydbhelper.property.TableProperty;
 import com.oldtree.ptydbhelper.query.Query;
@@ -31,8 +33,9 @@ public abstract class PtyAbstractDao<T> implements PtyDao<T> {
         this.aClass = aClass;
         mappingTable(this.aClass);
     }
+
     /**
-     * 映射表,这里我写死了
+     * 映射表
      * @param cls
      */
     protected void mappingTable(Class<?> cls){
@@ -188,7 +191,7 @@ public abstract class PtyAbstractDao<T> implements PtyDao<T> {
     /**
      * 根据列名查询
      */
-    public List<T> findByColumn(Object columnName,String condition,Object value){
+    public List<T> selectByColumn(Object columnName,String condition,Object value){
         Query query = QueryBuilder.build(aClass);
         switch (condition){
             case "=":
@@ -204,6 +207,8 @@ public abstract class PtyAbstractDao<T> implements PtyDao<T> {
                 query.like(columnName.toString(),value);
                 break;
             default:
+                query.eq(columnName.toString(),value);
+                PtyLog.w("条件自动转换为<<\t=\t>>了");
                 throw new IllegalStateException("====>\tUnexpected value: " + condition);
         }
         if(null==query.getConditions()||query.getConditions().equals("")){
