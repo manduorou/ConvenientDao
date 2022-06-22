@@ -1,0 +1,13 @@
+com.oldtree.convenientdao.async
+com.oldtree.convenientdao.cache
+com.oldtree.convenientdao.config
+com.oldtree.convenientdao.core
+com.oldtree.convenientdao.dao
+com.oldtree.convenientdao.db
+com.oldtree.convenientdao.exception
+com.oldtree.convenientdao.log
+com.oldtree.convenientdao.property
+com.oldtree.convenientdao.query
+com.oldtree.convenientdao.resolver
+com.oldtree.convenientdao.stmt
+com.oldtree.convenientdao.utils
