@@ -19,6 +19,8 @@ import java.util.List;
  * @Version 1.0
  */
 public class QueryBuilder<T> {
+    private static PoJoClassHandler poJoClassHandler = new PoJoClassHandler();
+
     public QueryBuilder() {
     }
     /**
@@ -29,7 +31,6 @@ public class QueryBuilder<T> {
      * @return 返回一个query对象
      */
     public static Query build(Class cls){
-        PoJoClassHandler poJoClassHandler = new PoJoClassHandler();
         List<Property> list = poJoClassHandler.createAllProperties(cls);
         StringBuffer head =new StringBuffer();
         StringBuffer constraint = new StringBuffer();
@@ -39,16 +40,42 @@ public class QueryBuilder<T> {
         for (Property property : list) {
             head.append(" ").append(property.columnName).append(",");
         }
-        int indexOf = head.lastIndexOf(",");
-        head.replace(indexOf,indexOf+1,"");
+        head = handledTheHead(head);
+        constraint = handledTheConstraint(cls,constraint);
+        return  new Query(head,constraint,conditions,end,list,cls);
+    }
+
+    public static Query buildToFun(Class cls ,Object... fields){
+        List<Property> list = poJoClassHandler.createAllProperties(cls);
+        StringBuffer head =new StringBuffer();
+        StringBuffer constraint = new StringBuffer();
+        StringBuffer conditions = new StringBuffer();
+        StringBuffer end = new StringBuffer();
+        head.append(SqlColumnTypesMapper.sqlMapper.get("select")).append(" ").append("count").append("(");
+        for (Object field : fields) {
+            head.append(field).append(",");
+        }
+        head.append(")").append(" as count");
+        head = handledTheHead(head);
+        constraint = handledTheConstraint(cls,constraint);
+        return new Query(head,constraint,conditions,end,list,cls);
+    }
+
+    private static StringBuffer handledTheConstraint(Class cls ,StringBuffer constraint){
         constraint.append(" ").append(SqlColumnTypesMapper.sqlMapper.get("from"));
         try {
             constraint.append(" ").append(TableUtils.getTableName(cls));
         } catch (PoJoException e) {
-            ConvenientDaoLog.e(e.getMessage());
+           // ConvenientDaoLog.e(e.getMessage());
             e.printStackTrace();
         }
-        return  new Query(head,constraint,conditions,end,list,cls);
+        return constraint;
+    }
+
+    private static StringBuffer handledTheHead(StringBuffer head){
+        int indexOf = head.lastIndexOf(",");
+        head.replace(indexOf,indexOf+1,"");
+        return head;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.oldtree.convenientdao.dao;
 
 import com.oldtree.convenientdao.query.Query;
+import com.sun.istack.internal.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -134,18 +135,63 @@ public class BaseDao<T> extends AbstractDao<T>{
     }
 
     @Override
+    public T findByColName(String colName, Object value) {
+        return super.findByColName(colName, value);
+    }
+
+    @Override
     public List<T> findAll() {
         return super.findAll();
     }
 
     @Override
-    public List<T> selectByColumn(Object columnName, String condition, Object value) {
-        return super.selectByColumn(columnName, condition, value);
+    public List<T> findList(String condition, Object... args) {
+        return super.findList(condition, args);
     }
 
     @Override
-    public long count(Object... columns) {
-        return super.count(columns);
+    public List<T> findList(String restrict, Map queryMap) {
+        return super.findList(restrict, queryMap);
+    }
+
+    @Override
+    public List<T> selectByColName(Object ColName, String condition, Object value) {
+        return super.selectByColName(ColName, condition, value);
+    }
+
+    @Override
+    public T findByCondition(String conditions, String... args) {
+        return super.findByCondition(conditions, args);
+    }
+
+    @Override
+    public T find(String condition, Object... args) {
+        return super.find(condition, args);
+    }
+
+    @Override
+    public T find(String restrict, Map queryMap) {
+        return super.find(restrict, queryMap);
+    }
+
+    @Override
+    public T findHead() {
+        return super.findHead();
+    }
+
+    @Override
+    public T findTail() {
+        return super.findTail();
+    }
+
+    @Override
+    public T findByQueryMap(Map queryMap) {
+        return super.findByQueryMap(queryMap);
+    }
+
+    @Override
+    public long count(Object... Cols) {
+        return super.count(Cols);
     }
 
     @Override
@@ -154,18 +200,18 @@ public class BaseDao<T> extends AbstractDao<T>{
     }
 
     @Override
-    public long count(Integer... columnIndexes) {
-        return super.count(columnIndexes);
+    public long count(Integer... ColIndexes) {
+        return super.count(ColIndexes);
     }
 
     @Override
-    public List<T> selectByColumnIndex(Integer columnIndex, String condition, Object value) {
-        return super.selectByColumnIndex(columnIndex, condition, value);
+    public List<T> selectByColIndex(Integer ColIndex, String condition, Object value) {
+        return super.selectByColIndex(ColIndex, condition, value);
     }
 
     @Override
-    public List<T> selectByColumns(String condition, Map map) {
-        return super.selectByColumns(condition, map);
+    public List<T> selectByCols(String condition, Map map) {
+        return super.selectByCols(condition, map);
     }
 
     @Override
@@ -174,23 +220,23 @@ public class BaseDao<T> extends AbstractDao<T>{
     }
 
     @Override
-    public T max(Object columnName) {
-        return super.max(columnName);
+    public T max(Object ColName) {
+        return super.max(ColName);
     }
 
     @Override
-    public T max(Integer columnIndex) {
-        return super.max(columnIndex);
+    public T max(Integer ColIndex) {
+        return super.max(ColIndex);
     }
 
     @Override
-    public T min(Object columnName) {
-        return super.min(columnName);
+    public T min(Object ColName) {
+        return super.min(ColName);
     }
 
     @Override
-    public T min(Integer columnIndex) {
-        return super.min(columnIndex);
+    public T min(Integer ColIndex) {
+        return super.min(ColIndex);
     }
 }
 

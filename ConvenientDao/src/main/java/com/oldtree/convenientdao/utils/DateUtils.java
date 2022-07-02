@@ -18,7 +18,7 @@ public final class DateUtils {
      * 得到本地的当前时间
      * @return 返回一个当前时间的字符串
      */
-    public static String Now(){
+    public static String now(){
         mDate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         formatDate = sdf.format(mDate);

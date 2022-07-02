@@ -1,9 +1,6 @@
 package com.oldtree.convenientdao.core;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 加上Ignore后即忽视模型的字段
@@ -12,6 +9,7 @@ import java.lang.annotation.Target;
  * @Date 2022/6/18
  * @Version 1.0
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface Ignore {

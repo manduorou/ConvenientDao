@@ -17,9 +17,25 @@ import com.oldtree.convenientdao.log.ConvenientDaoLog;
  */
 public final class ConvenientDaoInitializer {
     private static ConvenientDaoInitializer convenientDaoInitializer =null;
+    private String[] banners =new String[] {
+            "                       <<<欢迎使用>>>                        ",
+            "   本框架是一个轻量级ORM，便捷开发，支持原生sqlite语句，无其他依赖   ",
+            "    @@@@      @@              @@                            ",
+            "  @@    @@    @@              @@                            ",
+            " @@      @@   @@              @@                            ",
+            "@@        @@  @@              @@                            ",
+            "@@        @@  @@         @@@@ @@    @@@@@  @@@   @@@@  @@@@ ",
+            "@@        @@  @@        @     @@      @    @@ @  @     @    ",
+            " @@      @@   @@       @      @@      @    @@@   @@@@  @@@@ ",
+            "  @@    @@    @@        @    @@       @    @  @  @     @    ",
+            "    @@@@      @@@@@@@@   @@@  @@      @    @   @ @@@@  @@@@ ",
+            "                                                            ",
+            "                                              qq：493582307 ",
+            "                                          "+version+"    ",
+    };
     private Class<?> configCls;
     private TheadPool theadPool;
-    private static String version = "Version--1.0.5";
+    private static String version = "Version——1.0.5";
     public ConvenientDaoInitializer(Class<?> configCls) {
         this.configCls = configCls;
         this.theadPool = TheadPool.getInstance();
@@ -50,7 +66,11 @@ public final class ConvenientDaoInitializer {
             ConvenientDaoLog.e("空指针异常，context或者没有将注解配置类载入ConvenientDaoInitializer中。。");
             throw  new NullPointerException();
         }
-        ConfigProperty configProperty = ConfigProperty.getInstance(sqliteConfig.dbName(), sqliteConfig.dbVersion(), sqliteConfig.pojoClassArray(),context , sqliteConfig.appDebug());
+        ConfigProperty configProperty = ConfigProperty.getInstance(sqliteConfig.dbName(),
+                sqliteConfig.dbVersion(),
+                sqliteConfig.pojoClassArray(),
+                context , sqliteConfig.appDebug(),
+                sqliteConfig.daoTag());
         DBOpenHelper.getInstance(configProperty);
         showLogo();
         return this;
@@ -66,28 +86,15 @@ public final class ConvenientDaoInitializer {
         return getInstance(cls).autoConfig(context);
     }
     /**
-     * logo showing...
+     * TODO 版本后给设定bannerShow属性为false来取消显示
+     * 同时可以自动化
+     * showing...
+     *
      */
     private void showLogo(){
-        ConvenientDaoLog.v("------------------------------------------------------------");
-        ConvenientDaoLog.v("------------------------------------------------------------");
-        ConvenientDaoLog.v("-----------------------<<<欢迎使用>>>-------------------------");
-        ConvenientDaoLog.v("---本框架是一个轻量级ORM，便捷开发，支持原生sqlite语句，无其他依赖---");
-        ConvenientDaoLog.v("------------------------------------------------------------");
-        ConvenientDaoLog.v("----@@@@------@@--------------@@----------------------------");
-        ConvenientDaoLog.v("--@@----@@----@@--------------@@----------------------------");
-        ConvenientDaoLog.v("-@@------@@---@@--------------@@----------------------------");
-        ConvenientDaoLog.v("@@--------@@--@@--------------@@----------------------------");
-        ConvenientDaoLog.v("@@--------@@--@@---------@@@@-@@----@@@@@--@@@---@@@@--@@@@-");
-        ConvenientDaoLog.v("@@--------@@--@@--------@-----@@------@----@@-@--@-----@----");
-        ConvenientDaoLog.v("-@@------@@---@@-------@------@@------@----@@@---@@@@--@@@@-");
-        ConvenientDaoLog.v("--@@----@@----@@--------@----@@-------@----@--@--@-----@----");
-        ConvenientDaoLog.v("----@@@@-------@@@@@@@@---@@--@@------@----@---@-@@@@--@@@@-");
-        ConvenientDaoLog.v("------------------------------------------------------------");
-        ConvenientDaoLog.v("----------------------------------------------qq：493582307-");
-        ConvenientDaoLog.v("------------------------------------------"+version+"----");
-        ConvenientDaoLog.v("------------------------------------------------------------");
-        ConvenientDaoLog.v("------------------------------------------------------------");
+        for (String banner : banners) {
+            ConvenientDaoLog.v(banner);
+        }
     }
 }
 

@@ -4,6 +4,7 @@ import com.oldtree.convenientdao.exception.PoJoException;
 import com.oldtree.convenientdao.log.ConvenientDaoLog;
 import com.oldtree.convenientdao.property.Property;
 import com.oldtree.convenientdao.utils.TableUtils;
+import com.sun.istack.internal.Nullable;
 
 import java.util.List;
 
@@ -298,6 +299,16 @@ public class Query {
         constraint.append(")");
         int i = constraint.lastIndexOf(",");
         constraint.replace(i, i + 1, "");
+        return this;
+    }
+
+
+    public Query count(@Nullable Object col){
+        if(col!=null){
+
+        }else {
+
+        }
         return this;
     }
 

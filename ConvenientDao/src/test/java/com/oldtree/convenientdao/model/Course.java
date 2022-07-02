@@ -1,5 +1,8 @@
 package com.oldtree.convenientdao.model;
 
+import com.oldtree.convenientdao.core.Pk;
+import com.oldtree.convenientdao.core.PoJo;
+
 /**
  * 详细介绍类的情况.
  *
@@ -8,7 +11,9 @@ package com.oldtree.convenientdao.model;
  * @Date 2022/6/21
  * @Version 1.0
  */
+@PoJo
 public class Course {
+    @Pk
     private String id;
     private String name;
     private Long number;

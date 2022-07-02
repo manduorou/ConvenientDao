@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="ConvenientDao-1.0.5-SNAPSHOT:jar">
-    <output-path>$PROJECT_DIR$/snapshot/ConvenientDao-1.0.5-SNAPSHOT</output-path>
-    <root id="archive" name="ConvenientDao-1.0.5-SNAPSHOT.jar">
-      <element id="module-output" name="ConvenientDao" />
-    </root>
-  </artifact>
-</component>

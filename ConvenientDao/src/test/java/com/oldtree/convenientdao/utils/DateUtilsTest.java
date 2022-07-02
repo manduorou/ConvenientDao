@@ -8,6 +8,6 @@ public class DateUtilsTest {
 
     @Test
     public void test1(){
-        System.out.println(DateUtils.Now());
+        System.out.println(DateUtils.now());
     }
 }

@@ -18,13 +18,15 @@ public class ConfigProperty {
     private Class[] pojoClasses;
     private Context context;
     private Boolean appDebug;
+    private String daoTag;
+
 
     private static ConfigProperty configProperty;
-    public static final ConfigProperty getInstance(String dbName, int dbVersion, Class[] pojoClasses, Context context , Boolean appDebug){
+    public static final ConfigProperty getInstance(String dbName, int dbVersion, Class[] pojoClasses, Context context , Boolean appDebug ,String daoTag){
         if(configProperty==null){
             synchronized ((ConfigProperty.class)){
                 if (configProperty==null){
-                    configProperty = new ConfigProperty(dbName,dbVersion,pojoClasses,context,appDebug);
+                    configProperty = new ConfigProperty(dbName,dbVersion,pojoClasses,context,appDebug ,daoTag);
                 }
             }
         }
@@ -39,12 +41,13 @@ public class ConfigProperty {
         return configProperty;
     }
 
-    public ConfigProperty(String dbName, int dbVersion, Class[] pojoClasses, Context context , Boolean appDebug) {
+    public ConfigProperty(String dbName, int dbVersion, Class[] pojoClasses, Context context , Boolean appDebug , String daoTag) {
         this.dbName = dbName;
         this.dbVersion = dbVersion;
         this.pojoClasses = pojoClasses;
         this.context = context;
         this.appDebug = appDebug;
+        this.daoTag = daoTag;
     }
 
     public String getDbName() {
@@ -71,6 +74,10 @@ public class ConfigProperty {
 
     public Boolean getAppDebug() {
         return appDebug;
+    }
+
+    public String getDaoTag() {
+        return daoTag;
     }
 }
 

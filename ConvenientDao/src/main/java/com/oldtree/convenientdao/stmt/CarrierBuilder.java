@@ -19,6 +19,7 @@ import java.util.List;
  * @Version 1.0
  */
 public class CarrierBuilder {
+    private static List<Carrier> carrierList;
     /**
      * 设置值的时候需要加判断
      * @param object
@@ -57,9 +58,17 @@ public class CarrierBuilder {
     }
 
     public static List<Carrier> builds(List list){
-        List<Carrier> carrierList = new ArrayList<>();
+        carrierList = new ArrayList<>();
         for (Object obj : list) {
             carrierList.add(build(obj));
+        }
+        return carrierList;
+    }
+
+    public static List<Carrier> builds(Object... instances){
+        carrierList = new ArrayList<>();
+        for (Object instance : instances) {
+            carrierList.add(build(instance));
         }
         return carrierList;
     }

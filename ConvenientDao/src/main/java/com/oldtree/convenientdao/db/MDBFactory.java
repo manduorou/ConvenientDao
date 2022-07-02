@@ -3,6 +3,7 @@ package com.oldtree.convenientdao.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.oldtree.convenientdao.async.TheadPool;
+import com.oldtree.convenientdao.utils.DateUtils;
 import com.oldtree.convenientdao.utils.PoJoClassHandler;
 import com.oldtree.convenientdao.exception.ConfigException;
 import com.oldtree.convenientdao.exception.PoJoException;
@@ -253,7 +254,7 @@ public class MDBFactory implements TableFactory {
         public long insert(Carrier carrier) {
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
             long rows = sqLiteDatabase.insert(carrier.getTableName(),"", carrier.getContentValues());
-            ConvenientDaoLog.d("saveOne<"+carrier.getContentValues()+">\tresponse rows："+rows+"行"+new Date());
+            ConvenientDaoLog.d("saveOne<"+carrier.getContentValues()+">\tresponse rows："+rows+"行");
             dbOpenHelper.close();
             return rows;
         }
@@ -274,21 +275,21 @@ public class MDBFactory implements TableFactory {
         }
 
         @Override
-        public List<Long> update(Carrier... carriers) {
+        public long update(Carrier... carriers) {
             List<Long> list = new ArrayList<>();
             for (Carrier carrier : carriers) {
                 list.add(update(carrier));
             }
-            return list;
+            return 0L;
         }
 
         @Override
-        public List<Long> update(List<Carrier> carriers) {
+        public long update(List<Carrier> carriers) {
             rowsList = new ArrayList<>();
             for (Carrier carrier : carriers) {
                 rowsList.add(update(carrier));
             }
-            return rowsList;
+            return 0L;
         }
 
         @Override
@@ -301,28 +302,28 @@ public class MDBFactory implements TableFactory {
         }
 
         @Override
-        public List<Long> delete(Carrier... carriers) {
+        public long delete(Carrier... carriers) {
             rowsList = new ArrayList<>();
             for (Carrier carrier : carriers) {
                 rowsList.add(delete(carrier));
             }
-            return rowsList;
+            return 0L;
         }
 
         @Override
-        public List<Long> delete(List<Carrier> carriers) {
+        public long delete(List<Carrier> carriers) {
             rowsList = new ArrayList<>();
             for (Carrier carrier : carriers) {
                 rowsList.add(delete(carrier));
             }
-            return rowsList;
+            return 0L;
         }
 
         @Override
         public boolean deleteAll(String tableName) {
             sqLiteDatabase = dbOpenHelper.getWritableDatabase();
             long rows = sqLiteDatabase.delete(tableName,null,null);
-            ConvenientDaoLog.d("deleteAll!!<"+tableName+">\tresponse rows："+rows+"行"+new Date());
+            ConvenientDaoLog.d("deleteAll!!<"+tableName+">\tresponse rows："+rows+"行");
             dbOpenHelper.close();
             return rows>0L;
         }
@@ -334,7 +335,7 @@ public class MDBFactory implements TableFactory {
                 String tableName = TableUtils.getTableName(cls);
                 sqLiteDatabase = dbOpenHelper.getWritableDatabase();
                 rows = sqLiteDatabase.delete(tableName,null,null);
-                ConvenientDaoLog.d("deleteAll!!<"+tableName+">\tresponse rows："+rows+"行"+new Date());
+                ConvenientDaoLog.d("deleteAll!!<"+tableName+">\tresponse rows："+rows+"行");
                 dbOpenHelper.close();
             } catch (PoJoException e) {
                 e.printStackTrace();
@@ -387,6 +388,47 @@ public class MDBFactory implements TableFactory {
             cursor = sqLiteDatabase.rawQuery(sql, null);
             return cursor;
         }
+
+        @Override
+        public Cursor mQuery(Class cls,String conditions, String... args) {
+            sqLiteDatabase = dbOpenHelper.getReadableDatabase();
+            try {
+                String tableName = TableUtils.getTableName(cls);
+                cursor = sqLiteDatabase.query(tableName,null,conditions,args,null,null,null,null);
+                return cursor;
+            } catch (PoJoException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public List<E> queryList(String conditions, Object... args) {
+
+
+            return null;
+        }
+
+        @Override
+        public long query(String sql) {
+
+            return 0;
+        }
+
+        @Override
+        public List<E> mQuery(String sql) {
+
+
+            return null;
+        }
+
+        @Override
+        public E queryOne(String conditions, Object... args) {
+
+
+            return null;
+        }
+
         /**
          * 通过无参构造反射实例，对应类型调用set方法映射数据
          * @param fields

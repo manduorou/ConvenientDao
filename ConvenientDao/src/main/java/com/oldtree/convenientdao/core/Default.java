@@ -1,9 +1,6 @@
 package com.oldtree.convenientdao.core;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 如果你在列名设置了@NotNull {@linkplain com.oldtree.convenientdao.core.NotNull}
@@ -13,6 +10,7 @@ import java.lang.annotation.Target;
  * @Date 2022/6/20
  * @Version 1.0
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Default {

@@ -40,4 +40,5 @@ public @interface SqliteConfig {
      * @return 初始值为false，默认不开启语句调试，改成true开启语句调试
      */
     boolean appDebug() default false;
+    String daoTag() default "ConvenientDao";
 }

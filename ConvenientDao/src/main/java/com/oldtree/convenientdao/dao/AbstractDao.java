@@ -36,14 +36,19 @@ import java.util.Set;
 public abstract class AbstractDao<T> implements ConvenientDao<T> {
     private MDBFactory MDBFactory;
     private Class<?> aClass;
+    private long count;
+    private Property pkProperty;
+    private Query query;
+    private SQLiteDatabase database;
 
     /**
      * TODO 这里需要检查aClass的完整性
      * @param aClass
      */
     public AbstractDao(@NotNull Class<?> aClass){
-        MDBFactory = MDBFactory.build();
         this.aClass = aClass;
+        MDBFactory = MDBFactory.build();
+        query = QueryBuilder.build(aClass);
     }
     protected void mappingTable(){
         createTable();
@@ -85,8 +90,6 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
     //TODO 2.0.0版本新内容,加入数据库伪热部署
     @Override
     public boolean entrusted() {
-
-
         return false;
     }
 
@@ -170,8 +173,6 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
         return MDBFactory.getPerformer().deleteByCarrier(carrier);
     }
 
-
-    //TODO 根据主键删除数据返回响应结果
     @Override
     public long delete(Object fk) {
         Object instance = null;
@@ -188,6 +189,13 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
     //TODO 根据主键删除，返回响应结果
     @Override
     public boolean delete(Object... fks) {
+        Object instance = null;
+        try {
+            instance =  aClass.newInstance();
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+        List<Carrier> builds = CarrierBuilder.builds(fks);
 
         return false;
     }
@@ -197,7 +205,6 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
         return MDBFactory.getPerformer().deleteAll(this.aClass);
     }
 
-    //TODO 根据主键删除，返回响应结果
     @Override
     public boolean deleteByFks(Object... fks) {
         return false;
@@ -246,16 +253,25 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
     }
 
     @Override
-    public T findByFk(Object fk){
-        Property pkProperty = null;
+    public T findByFk(Object fkValue){
+        pkProperty = null;
         try {
             pkProperty = MDBFactory.getPoJoClassHandler().createPkProperty(this.aClass);
         } catch (PoJoException e) {
             e.printStackTrace();
         }
-        Query query = QueryBuilder.build(this.aClass)
-                .eq(pkProperty,fk);
+        query.eq(pkProperty,fkValue);
         List<T> list = MDBFactory.getPerformer().rawQuery(query);
+        T instance = null;
+        if(null!=list&&list.size()>0){
+            instance = list.get(0);
+        }
+        return instance;
+    }
+
+    @Override
+    public T findByColName(@NotNull String colName , Object value) {
+        List<T> list = MDBFactory.getPerformer().rawQuery(query.eq(colName,value));
         T instance = null;
         if(null!=list&&list.size()>0){
             instance = list.get(0);
@@ -269,23 +285,65 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
         return MDBFactory.getPerformer().rawQuery(query);
     }
 
-    public List<T> selectByColumn(Object columnName,String condition,Object value){
+    @Override
+    public List<T> findList(String condition, Object... args) {
+        return MDBFactory.getPerformer().queryList(condition,args);
+    }
+
+    @Override
+    public List<T> findList(String restrict, Map queryMap) {
+
+        return null;
+    }
+
+    @Override
+    public T findByCondition(String conditions, String... args) {
+        return null;
+    }
+
+    @Override
+    public T find(String condition, Object... args) {
+        return null;
+    }
+
+    @Override
+    public T find(String restrict, Map queryMap) {
+        return null;
+    }
+
+    @Override
+    public T findHead() {
+        return null;
+    }
+
+    @Override
+    public T findTail() {
+        return null;
+    }
+
+    @Override
+    public T findByQueryMap(Map queryMap) {
+        return null;
+    }
+
+    @Override
+    public List<T> selectByColName(Object ColName,String condition,Object value){
         Query query = QueryBuilder.build(aClass);
         switch (condition){
             case "=":
-                query.eq(columnName.toString(),value);
+                query.eq(ColName.toString(),value);
                 break;
             case ">":
-                query.gt(columnName.toString(),value);
+                query.gt(ColName.toString(),value);
                 break;
             case "<":
-                query.lt(columnName.toString(),value);
+                query.lt(ColName.toString(),value);
                 break;
             case "lk":
-                query.like(columnName.toString(),value);
+                query.like(ColName.toString(),value);
                 break;
             default:
-                query.eq(columnName.toString(),value);
+                query.eq(ColName.toString(),value);
                 ConvenientDaoLog.w("条件自动转换为<<\t=\t>>了");
                 throw new IllegalStateException("====>\tUnexpected value: " + condition);
         }
@@ -295,33 +353,42 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
         return getList(query);
     }
 
+
+
     // TODO 根据列名计数
     @Override
-    public long count(Object... columns) {
+    public long count(Object... Cols) {
         return 0;
     }
 
     //TODO 所有数据记数
     @Override
     public long dataCount() {
-        return 0;
+        Query query = QueryBuilder.buildToFun(this.aClass,"*");
+        Cursor cursor = MDBFactory.getPerformer().query(query);
+        count = cursor.getLong(0);
+        SQLiteDatabase readableDatabase = MDBFactory.getDbOpenHelper().getReadableDatabase();
+        if(readableDatabase.isOpen()){
+            readableDatabase.close();
+        }
+        return count;
     }
 
-    //TODO 根据多列的index进行计数
+    //TODO 根据多列的index进行计数,暂时未弄
     @Override
-    public long count(Integer... columnIndexes) {
-        return 0;
+    public long count(Integer... ColIndexes) {
+        return count;
     }
 
     //TODO 根据多列的index值的condition查询
     @Override
-    public List<T> selectByColumnIndex(Integer columnIndex, String condition, Object value) {
+    public List<T> selectByColIndex(Integer ColIndex, String condition, Object value) {
         return null;
     }
 
     //TODO 根据前提条件的condition遍历map查询
     @Override
-    public List<T> selectByColumns(String condition, Map map) {
+    public List<T> selectByCols(String condition, Map map) {
         map.forEach((k,v)->{
 
         });
@@ -336,22 +403,22 @@ public abstract class AbstractDao<T> implements ConvenientDao<T> {
 
     //TODO 获取对应列名最大的实例
     @Override
-    public T max(Object columnName) {
+    public T max(Object ColName) {
         return null;
     }
     //TODO 获取对应列名最大的实例
     @Override
-    public T max(Integer columnIndex) {
+    public T max(Integer ColIndex) {
         return null;
     }
     //TODO 获取对应列名最小的实例
     @Override
-    public T min(Object columnName) {
+    public T min(Object ColName) {
         return null;
     }
     //TODO 获取对应列名最小的实例
     @Override
-    public T min(Integer columnIndex) {
+    public T min(Integer ColIndex) {
         return null;
     }
 }

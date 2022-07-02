@@ -25,13 +25,31 @@ public interface Performer<E> {
     public long insert(Carrier carrier);
     public boolean insertList(List<Carrier> carrierList);
     public long update(Carrier carrier);
-    public List<Long> update(Carrier...carriers);
-    public List<Long> update(List<Carrier> carriers);
+    public long update(Carrier...carriers);
+    public long update(List<Carrier> carriers);
     public long delete(Carrier carrier);
-    public List<Long> delete(Carrier...carriers);
-    public List<Long> delete(List<Carrier> carriers);
+    public long delete(Carrier...carriers);
+    public long delete(List<Carrier> carriers);
     public boolean deleteAll(String tableName);
     public long deleteAll(Class<E> cls);
+
     public List<E> rawQuery(Query query);
+
     public Cursor query(Query query);
+
+    public Cursor mQuery(Class cls,String conditions,String...args);
+
+    public List<E> queryList(String conditions,Object...args);
+
+    public long query(String sql);
+
+    public List<E> mQuery(String sql);
+
+    public E queryOne(String conditions,Object...args);
+
+    //1.1.5版本内容,回调
+    public interface callBack<E>{
+        public void success (E data);
+        public void error(Throwable throwable);
+    }
 }
